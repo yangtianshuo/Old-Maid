@@ -1,9 +1,9 @@
-#Tianshuo Yang
 #Old Maid card game
 
 import random
 
 #Deal cards to a number of players
+#Return the hands of every player
 def deal_card(num_players):
     deck = [*range(2, 11), *range(2, 11), *range(2, 11), *range(2, 11),'A','J','Q','K','A','J','Q','K','A','J','Q','K','A','J','Q','K','Joker']
     random.shuffle(deck)
@@ -14,7 +14,8 @@ def deal_card(num_players):
                 all_hands[i].append(deck.pop())
     return all_hands
 
-#Take a list and rotate it to the left once
+#Rotate a list left once
+#Return the list
 def rotate_left(lst):
     first = lst[0]
     for i in range(len(lst)-1):
@@ -37,8 +38,8 @@ def discard_pair(lst):
             i += 1
     return pairs
 
-#Input: a list
-#Return a user selected index
+#Allow user to pick a card
+#Return the index of the selected card
 def player_pick(lst):
     print("Select a card (1-" + str(len(lst)) + ")")
     while True:
@@ -49,21 +50,13 @@ def player_pick(lst):
         except ValueError:
             print("Invalid input")
 
-#Input: a list consisting of other lists as elements, a card
-#Add card to the first list
+#Insert a card into the first list
+#of a list of lists
 #Return the main list
 def move_card(lst,card):
     lst[0].insert(random.randint(0,len(lst[0])), card)
     return lst
 
-#Return true if user enter yes, false for no
-def play_again():
-    while True:
-        n = input("Do you want to play again? ")
-        if n.lower() == "yes":
-            return True
-        elif n.lower() == "no":
-            return False
 
 #Gameplay
 def old_maid():
@@ -90,23 +83,27 @@ def old_maid():
     discarded_pairs = {}
     for i in range(len(all_hands)):
         discarded_pairs[players[i]] = discard_pair(all_hands[i])
+    print()
+    print("Starting pairs discarded:")
+    print(discarded_pairs)
+    print()
     #Rotate the list so the first player is at the beginning
     for i in range(players.index(first_player)):
         rotate_left(players)
         rotate_left(all_hands)
     #Pick and discard cards until one person remain in the game
+    r = 1
     while True:
-        print()
-        print("Discarded pairs:")
-        print(discarded_pairs)
-        print()
+        print("Round",r,"-----",players[0],"turn")
+        r += 1
         #Player and computer pick card
         if players[0] == "Human":
-            print("Your deck",all_hands[0])
+            print("YOUR DECK",all_hands[0])
             for i in range(1,len(players)):
                 print(players[i],"has",len(all_hands[i]),"cards")
             pos = player_pick(all_hands[-1])
         else:
+            print(players[0],"picking...")
             pos = random.randint(0,len(all_hands[-1])-1)
         #If the selected card is in the deck, discard the pair
         #Otherwise move it in the deck at a random location
@@ -115,11 +112,16 @@ def old_maid():
             all_hands[0].remove(selected_card)
             discarded_pairs[players[0]].append((selected_card,selected_card))
         else:
-             move_card(all_hands,selected_card)   
+             move_card(all_hands,selected_card)
+        #Reveal which cards are discarded at the end of the round
+        print()
+        print("Discarded pairs:")
+        print(discarded_pairs)
+        print()
         #Rotate the list so the person on the right goes next
         rotate_left(players)
         rotate_left(all_hands)
-        #Remove the players without cards from the game, they are winners!
+        #Remove the players without cards from the game
         for i in range(-2,0):
             if len(all_hands[i]) == 0:
                 players.pop(i)
@@ -129,14 +131,4 @@ def old_maid():
             print(players[0],"lose")
             break
 
-while True:
-    n = input("Do you want to play again? ")
-    if n.lower() == "yes":
-        old_maid()
-    elif n.lower() == "no":
-        break
-
-
-    
-
-
+old_maid()
